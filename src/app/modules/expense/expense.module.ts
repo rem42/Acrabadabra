@@ -8,7 +8,7 @@ import { ExpenseMiscellaneousFormComponent } from './components/expense-miscella
 import { ExpenseMiscellaneousTableComponent } from './components/expense-miscellaneous-table/expense-miscellaneous-table.component';
 import { ExpenseFlatFeeFormComponent } from './components/expense-flat-fee-form/expense-flat-fee-form.component';
 import { ExpenseFlatFeeTableComponent } from './components/expense-flat-fee-table/expense-flat-fee-table.component';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -19,7 +19,7 @@ import { FormsModule } from '@angular/forms';
     ExpenseFlatFeeFormComponent,
     ExpenseFlatFeeTableComponent,
   ],
-  imports: [CommonModule, ExpenseRoutingModule, FormsModule],
+  imports: [CommonModule, ExpenseRoutingModule, FormsModule, ReactiveFormsModule],
   exports: [
     CommonModule,
     ExpenseMileageFormComponent,

@@ -1,7 +1,8 @@
-import { Component, OnInit, ViewChild, Input, Output, EventEmitter } from '@angular/core';
-import { NgForm } from '@angular/forms';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { FlatFee } from '@model/flat-fee.model';
 import { TimesheetService } from '../../../timesheet/services/timesheet.service';
+import { Regex } from '@utils/regex';
 
 @Component({
   selector: 'app-expense-flat-fee-form',
@@ -9,10 +10,13 @@ import { TimesheetService } from '../../../timesheet/services/timesheet.service'
   styleUrls: ['./expense-flat-fee-form.component.scss'],
 })
 export class ExpenseFlatFeeFormComponent implements OnInit {
-  @ViewChild('expenseForm', { static: true }) form: NgForm;
+  form = new FormGroup({
+    date: new FormControl(null, [Validators.required, Validators.pattern(Regex.DATE)]),
+    amount: new FormControl(null, [Validators.required, Validators.pattern(Regex.AMOUNT)]),
+  });
+
   @Input() flatFees: FlatFee[];
   @Output() changed: EventEmitter<boolean> = new EventEmitter();
-  flatFee = new FlatFee('', null);
   submitted = false;
 
   constructor(public timesheetService: TimesheetService) {}
@@ -20,6 +24,7 @@ export class ExpenseFlatFeeFormComponent implements OnInit {
   ngOnInit(): void {
     this.flatFees = this.timesheetService.timesheet.flatFees;
     this.form.valueChanges.subscribe(() => {
+      console.log(this.form.get('amount'));
       if (this.form.dirty) {
         this.changed.emit(true);
       }
@@ -29,7 +34,7 @@ export class ExpenseFlatFeeFormComponent implements OnInit {
   onSubmit(): void {
     if (this.form.valid) {
       this.submitted = true;
-      this.flatFees.push(Object.assign(new FlatFee(), this.flatFee));
+      this.flatFees.push(Object.assign(new FlatFee(), this.form.getRawValue()));
       this.changed.emit(true);
     } else {
       Object.keys(this.form.controls).forEach(field => {

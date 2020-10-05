@@ -14,7 +14,8 @@
     "paths": {
       "@model/*": ["src/app/shared/models/*"],
       "@services/*": ["src/app/shared/services/*"],
-      "@directives/*": ["src/app/shared/directives/*"]
+      "@directives/*": ["src/app/shared/directives/*"],
+      "@utils/*": ["src/app/shared/utils/*"]
     },
     "target": "es2015",
     "types": [

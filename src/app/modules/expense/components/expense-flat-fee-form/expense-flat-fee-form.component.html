@@ -1,4 +1,4 @@
-<form #expenseForm="ngForm" (ngSubmit)="onSubmit()">
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
     <div class="flat-fee-form">
         <div class="flat-fee-form__block">
             <h4 class="flat-fee-form__block__title">Déplacements forfaitaires </h4>
@@ -6,20 +6,19 @@
                 <div class="flat-fee-form__block__input-wrapper__item form-group" data-role="flat-fee-block-date">
                     <label for="date" class="flat-fee-form__block__input-wrapper__item__label">Date</label>
                     <div class="flat-fee-form__block__input-wrapper__item__input">
-                        <input type="date"
-                               pattern="\d{4}-\d{2}-\d{2}"
-                               class="form-control"
-                               name="date"
-                               [(ngModel)]="flatFee.date"
-                               required
-                               id="date"
-                               #date="ngModel"
-                               data-role="flat-fee-input-date"/>
-                        <div *ngIf="date.invalid && (date.dirty || date.touched)" class="alert alert-danger">
-                            <div *ngIf="date.errors['required']">
+                        <input
+                            formControlName="date"
+                            type="date"
+                            class="form-control"
+                            name="date"
+                            required
+                            id="date"
+                            data-role="flat-fee-input-date"/>
+                        <div *ngIf="form.get('date').invalid && (form.get('date').dirty || form.get('date').touched)" class="alert alert-danger">
+                            <div *ngIf="form.get('date').errors['required']">
                                 Ce champ est obligatoire.
                             </div>
-                            <div *ngIf="date.errors['pattern']">
+                            <div *ngIf="form.get('date').errors['pattern']">
                                 La date devrait respecter aaaa-mm-jj.
                             </div>
                         </div>
@@ -30,21 +29,20 @@
                         Montant HT (€)
                     </label>
                     <div class="flat-fee-form__block__input-wrapper__item__input">
-                        <input placeholder="ex: 25.50"
-                               type="text"
-                               pattern="([0-9]+(\.[0-9]+)?)"
-                               class="form-control"
-                               name="amount"
-                               [(ngModel)]="flatFee.amount"
-                               data-role="flat-fee-input-amount"
-                               required
-                               id="amount"
-                               #amount="ngModel"/>
-                        <div *ngIf="amount.invalid && (amount.dirty || amount.touched)" class="alert alert-danger">
-                            <div *ngIf="amount.errors['required']">
+                        <input
+                            type="text"
+                            formControlName="amount"
+                            name="amount"
+                            id="amount"
+                            data-role="flat-fee-input-amount"
+                            class="form-control"
+                            placeholder="ex: 25.50"
+                            required/>
+                        <div *ngIf="form.get('amount').invalid && (form.get('amount').dirty || form.get('amount').touched)" class="alert alert-danger">
+                            <div *ngIf="form.get('amount').errors['required']">
                                 Ce champ est obligatoire.
                             </div>
-                            <div *ngIf="amount.errors['pattern']">
+                            <div *ngIf="form.get('amount').errors['pattern']">
                                 Seul des chiffres et un point sont acceptés
                             </div>
                         </div>
