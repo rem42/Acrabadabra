@@ -1,4 +1,4 @@
-<form #expenseForm="ngForm" (ngSubmit)="onSubmit()">
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
     <div class="mileage-allowance-form">
         <div class="mileage-allowance-form__block">
             <h4 class="mileage-allowance-form__block__title">Indemnités kilométriques</h4>
@@ -8,21 +8,18 @@
                     <label for="date" class="mileage-allowance-form__block__input-wrapper__item__label">Date</label>
                     <div class="mileage-allowance-form__block__input-wrapper__item__input">
                         <input
-                            data-role="ik-input-date"
+                            formControlName="date"
                             type="date"
-                            pattern="\d{4}-\d{2}-\d{2}"
+                            data-role="ik-input-date"
                             class="form-control"
                             name="date"
-                            [(ngModel)]="commute.date"
                             required
-                            id="date"
-                            #date="ngModel"
-                        >
-                        <div *ngIf="date.invalid && (date.dirty || date.touched)" class="alert alert-danger">
-                            <div *ngIf="date.errors['required']">
+                            id="date" />
+                        <div *ngIf="form.get('date').invalid && (form.get('date').dirty || form.get('date').touched)" class="alert alert-danger">
+                            <div *ngIf="form.get('date').errors['required']">
                                 Ce champ est obligatoire.
                             </div>
-                            <div *ngIf="date.errors['pattern']">
+                            <div *ngIf="form.get('date').errors['pattern']">
                                 La date devrait respecter aaaa-mm-jj.
                             </div>
                         </div>
@@ -34,30 +31,27 @@
                            class="mileage-allowance-form__block__input-wrapper__item__label">Trajet</label>
                     <div class="mileage-allowance-form__block__input-wrapper__item__input">
                         <input
+                            formControlName="journey"
+                            type="text"
                             data-role="ik-input-journey"
                             placeholder="ex: AR Annecy-Grenoble"
-                            type="text"
-                            pattern="^\S[A-zÀ-ÿ\s'-]+$"
                             class="form-control"
                             name="journey"
-                            [(ngModel)]="commute.journey"
                             required
-                            id="journey"
-                            #journey="ngModel"
-                        >
-                        <div *ngIf="journey.invalid && (journey.dirty || journey.touched)" class="alert alert-danger">
-                            <div *ngIf="journey.errors['required']">
+                            id="journey" />
+                        <div *ngIf="form.get('journey').invalid && (form.get('journey').dirty || form.get('journey').touched)" class="alert alert-danger">
+                            <div *ngIf="form.get('journey').errors['required']">
                                 Ce champ est obligatoire.
                             </div>
-                            <div *ngIf="journey.errors['pattern']">
+                            <div *ngIf="form.get('journey').errors['pattern']">
                                 Le nom ne doit contenir que des lettres.
                             </div>
                         </div>
                     </div>
                 </div>
                 <div [ngClass]="{
-                  'mileage-allowance-form__block__input-wrapper__item form-group':!vehiclesService.isCustomizable(this.commute),
-                  'mileage-allowance-form__block__input-wrapper__item--3col form-group2':vehiclesService.isCustomizable(this.commute)
+                  'mileage-allowance-form__block__input-wrapper__item form-group':!vehiclesService.isCustomizable(this.form.get('vehicleSelected').value),
+                  'mileage-allowance-form__block__input-wrapper__item--3col form-group2':vehiclesService.isCustomizable(this.form.get('vehicleSelected').value)
                   }"
                      data-role="ik-block-distance">
                     <label for="distance" class="mileage-allowance-form__block__input-wrapper__item__label">
@@ -65,31 +59,29 @@
                     </label>
                     <div class="mileage-allowance-form__block__input-wrapper__item__input">
                         <input
+                            formControlName="distance"
+                            type="text"
                             data-role="ik-input-distance"
                             placeholder="ex: 120"
-                            type="text"
                             pattern="[0-9]+"
                             class="form-control"
                             name="distance"
-                            [(ngModel)]="commute.distance"
                             required
-                            id="distance"
-                            #distance="ngModel"
-                        >
-                        <div *ngIf="distance.invalid && (distance.dirty || distance.touched)"
+                            id="distance" />
+                        <div *ngIf="form.get('distance').invalid && (form.get('distance').dirty || form.get('distance').touched)"
                              class="alert alert-danger">
-                            <div *ngIf="distance.errors['required']">
+                            <div *ngIf="form.get('distance').errors['required']">
                                 Ce champ est obligatoire.
                             </div>
-                            <div *ngIf="distance.errors['pattern']">
+                            <div *ngIf="form.get('distance').errors['pattern']">
                                 Seul des chiffres sont acceptés
                             </div>
                         </div>
                     </div>
                 </div>
                 <div [ngClass]="{
-                      'mileage-allowance-form__block__input-wrapper__item form-group':!vehiclesService.isCustomizable(this.commute),
-                      'mileage-allowance-form__block__input-wrapper__item--3col form-group2':vehiclesService.isCustomizable(this.commute)
+                      'mileage-allowance-form__block__input-wrapper__item form-group':!vehiclesService.isCustomizable(this.form.get('vehicleSelected').value),
+                      'mileage-allowance-form__block__input-wrapper__item--3col form-group2':vehiclesService.isCustomizable(this.form.get('vehicleSelected').value)
                      }"
                      data-role="ik-block-vehicle">
                     <label for="vehicle" class="mileage-allowance-form__block__input-wrapper__item__label">
@@ -97,27 +89,26 @@
                     </label>
                     <div class="mileage-allowance-form__block__input-wrapper__item__input">
                         <select
+                            formControlName="vehicleSelected"
                             data-role="ik-input-vehicle"
                             class="form-control"
                             name="vehicle"
-                            [(ngModel)]="commute.vehicleSelected"
-                            id="vehicle"
-                            #vehicle="ngModel">
+                            id="vehicle">
                         <option [ngValue]="undefined" disabled selected>Votre véhicule</option>
-                        <option *ngFor="let vehicle of vehicles, let i = index" [ngValue]="i">
+                        <option *ngFor="let vehicle of vehiclesService.vehicles, let i = index" [ngValue]="i">
                             {{ vehicle.typeOfRate }} {{ vehicle.horsePower }} ({{ vehicle.allowance }}€/km)
                         </option>
                         </select>
-                        <div *ngIf="vehicle.invalid && (vehicle.dirty || vehicle.touched)" class="alert alert-danger">
-                            <div *ngIf="vehicle.errors['required']">
+                        <div *ngIf="form.get('vehicleSelected').invalid && (form.get('vehicleSelected').dirty || form.get('vehicleSelected').touched)" class="alert alert-danger">
+                            <div *ngIf="form.get('vehicleSelected').errors['required']">
                                 Ce champ est obligatoire.
                             </div>
                         </div>
                     </div>
                 </div>
-                <div *ngIf="vehiclesService.isCustomizable(this.commute)" [ngClass]="{
-                      'mileage-allowance-form__block__input-wrapper__item form-group':!vehiclesService.isCustomizable(this.commute),
-                      'mileage-allowance-form__block__input-wrapper__item--3col form-group2':vehiclesService.isCustomizable(this.commute)
+                <div *ngIf="vehiclesService.isCustomizable(this.form.get('vehicleSelected').value)" [ngClass]="{
+                      'mileage-allowance-form__block__input-wrapper__item form-group':!vehiclesService.isCustomizable(this.form.get('vehicleSelected').value),
+                      'mileage-allowance-form__block__input-wrapper__item--3col form-group2':vehiclesService.isCustomizable(this.form.get('vehicleSelected').value)
                      }"
                      data-role="ik-block-tax-rate">
                     <label for="taxRate" class="mileage-allowance-form__block__input-wrapper__item__label">
@@ -125,21 +116,20 @@
                     </label>
                     <div class="mileage-allowance-form__block__input-wrapper__item__input">
                         <input
+                            formControlName="allowance"
                             data-role="ik-input-tax-rate"
                             placeholder="ex: 0.650"
                             type="text"
                             pattern="^[0-9.]+$"
                             class="form-control"
                             name="taxRate"
-                            [(ngModel)]="commute.allowance"
                             required
-                            id="taxRate"
-                            #taxRate="ngModel"/>
-                        <div *ngIf="taxRate.invalid && (taxRate.dirty || taxRate.touched)" class="alert alert-danger">
-                            <div *ngIf="taxRate.errors['required']">
+                            id="taxRate"/>
+                        <div *ngIf="form.get('allowance').invalid && (form.get('allowance').dirty || form.get('allowance').touched)" class="alert alert-danger">
+                            <div *ngIf="form.get('allowance').errors['required']">
                                 Ce champ est obligatoire.
                             </div>
-                            <div *ngIf="taxRate.errors['pattern']">
+                            <div *ngIf="form.get('allowance').errors['pattern']">
                                 Seul des chiffres et un point sont acceptés
                             </div>
                         </div>

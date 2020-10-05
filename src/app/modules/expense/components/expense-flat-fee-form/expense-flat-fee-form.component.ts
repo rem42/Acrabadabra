@@ -10,36 +10,27 @@ import { Regex } from '@utils/regex';
   styleUrls: ['./expense-flat-fee-form.component.scss'],
 })
 export class ExpenseFlatFeeFormComponent implements OnInit {
+  @Input() flatFees: FlatFee[];
+  @Output() changed: EventEmitter<boolean> = new EventEmitter();
+
   form = new FormGroup({
     date: new FormControl(null, [Validators.required, Validators.pattern(Regex.DATE)]),
     amount: new FormControl(null, [Validators.required, Validators.pattern(Regex.AMOUNT)]),
   });
 
-  @Input() flatFees: FlatFee[];
-  @Output() changed: EventEmitter<boolean> = new EventEmitter();
-  submitted = false;
-
   constructor(public timesheetService: TimesheetService) {}
 
   ngOnInit(): void {
     this.flatFees = this.timesheetService.timesheet.flatFees;
-    this.form.valueChanges.subscribe(() => {
-      console.log(this.form.get('amount'));
-      if (this.form.dirty) {
-        this.changed.emit(true);
-      }
-    });
   }
 
   onSubmit(): void {
-    if (this.form.valid) {
-      this.submitted = true;
-      this.flatFees.push(Object.assign(new FlatFee(), this.form.getRawValue()));
-      this.changed.emit(true);
-    } else {
-      Object.keys(this.form.controls).forEach(field => {
-        this.form.controls[field].markAsTouched();
-      });
+    if (!this.form.valid) {
+      this.form.markAllAsTouched();
+      return;
     }
+
+    this.flatFees.push(Object.assign(new FlatFee(), this.form.getRawValue()));
+    this.changed.emit(true);
   }
 }

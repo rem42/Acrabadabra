@@ -45,7 +45,7 @@ export class VehiclesService {
     },
   ];
 
-  isCustomizable(commute: Commute): boolean {
-    return commute.vehicleSelected !== undefined && this.vehicles[commute.vehicleSelected].customizable;
+  isCustomizable(vehicleSelected: number): boolean {
+    return vehicleSelected !== undefined && vehicleSelected !== null && this.vehicles[vehicleSelected].customizable;
   }
 }

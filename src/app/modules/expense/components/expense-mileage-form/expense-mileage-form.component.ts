@@ -1,10 +1,11 @@
 import { Component, OnInit, ViewChild, Input, Output, EventEmitter } from '@angular/core';
-import { NgForm } from '@angular/forms';
-
+import { FormControl, FormGroup, NgForm, Validators } from '@angular/forms';
 import { Commute } from '@model/commute';
-
 import { TimesheetService } from 'src/app/modules/timesheet/services/timesheet.service';
 import { VehiclesService } from '../../services/vehicles.service';
+import { Regex } from '@utils/regex';
+import { FlatFee } from '@model/flat-fee.model';
+import { plainToClass } from 'class-transformer';
 
 @Component({
   selector: 'app-expense-mileage-form',
@@ -12,18 +13,20 @@ import { VehiclesService } from '../../services/vehicles.service';
   styleUrls: ['./expense-mileage-form.component.scss'],
 })
 export class ExpenseMileageFormComponent implements OnInit {
-  @ViewChild('expenseForm', { static: true }) form: NgForm;
   @Input() commutes: Commute[];
   @Output() changed: EventEmitter<boolean> = new EventEmitter();
 
-  commute = new Commute('', '', null, '', null);
-  submitted = false;
-  vehicles: any[];
+  form = new FormGroup({
+    date: new FormControl(null, [Validators.required, Validators.pattern(Regex.DATE)]),
+    journey: new FormControl(null, [Validators.required, Validators.pattern(Regex.TEXT_WITHOUT_ACCENT)]),
+    distance: new FormControl(null, [Validators.required, Validators.pattern(Regex.NUMBERS)]),
+    vehicleSelected: new FormControl(null, [Validators.required]),
+    allowance: new FormControl(null),
+  });
 
   constructor(public vehiclesService: VehiclesService, public timesheetService: TimesheetService) {}
 
   ngOnInit(): void {
-    this.vehicles = this.vehiclesService.vehicles;
     this.commutes = this.timesheetService.timesheet.commutes;
 
     this.form.valueChanges.subscribe(() => {
@@ -34,18 +37,20 @@ export class ExpenseMileageFormComponent implements OnInit {
   }
 
   onSubmit(): void {
-    if (this.form.valid) {
-      if (!this.vehiclesService.isCustomizable(this.commute)) {
-        this.commute.allowance = this.vehiclesService.vehicles[this.commute.vehicleSelected].allowance;
-      }
-      this.submitted = true;
-      this.commute.mileageAllowance = this.commute.distance * this.commute.allowance;
-      this.commutes.push({ ...this.commute });
-      this.changed.emit(true);
-    } else {
-      Object.keys(this.form.controls).forEach(field => {
-        this.form.controls[field].markAsTouched();
-      });
+    if (!this.form.valid) {
+      this.form.markAllAsTouched();
+      return;
     }
+
+    const formValues = this.form.getRawValue();
+
+    if (!this.vehiclesService.isCustomizable(formValues.vehicleSelected)) {
+      formValues.allowance = this.vehiclesService.vehicles[formValues.vehicleSelected].allowance;
+    }
+
+    formValues.mileageAllowance = formValues.distance * formValues.allowance;
+    const commute = plainToClass(Commute, formValues);
+    this.commutes.push(commute);
+    this.changed.emit(true);
   }
 }
