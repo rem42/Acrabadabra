@@ -6,13 +6,17 @@ import { Injectable } from '@angular/core';
 export class MonetaryService {
   constructor() {}
 
-  vatRates = { exempt: 0, greatlyReduced: 5.5, reduced: 10, normal: 20 };
+  static readonly VAT_RATES = { exempt: 0, greatlyReduced: 5.5, reduced: 10, normal: 20 };
 
   get currencyCode(): string {
     return 'EUR';
   }
 
   get vatRate(): number {
-    return this.vatRates.normal;
+    return MonetaryService.VAT_RATES.normal;
+  }
+
+  static get arrayVat(): string[] {
+    return Object.values(MonetaryService.VAT_RATES).map(rate => rate.toString());
   }
 }

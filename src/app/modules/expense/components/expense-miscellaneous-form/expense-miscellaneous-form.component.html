@@ -1,4 +1,4 @@
-<form #expenseForm="ngForm" (ngSubmit)="onSubmit()">
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
     <div class="expense-miscellaneous-form">
         <div class="expense-miscellaneous-form__block">
             <h4 class="expense-miscellaneous-form__block__title">Frais sur justificatifs</h4>
@@ -7,20 +7,19 @@
                      data-role="miscellaneous-block-date">
                     <label for="date" class="expense-miscellaneous-form__block__input-wrapper__item__label">Date</label>
                     <div class="expense-miscellaneous-form__block__input-wrapper__item__input">
-                        <input type="date"
-                               pattern="\d{4}-\d{2}-\d{2}"
-                               class="form-control"
-                               name="date"
-                               [(ngModel)]="misc.date"
-                               data-role="miscellaneous-input-date"
-                               required
-                               id="date"
-                               #date="ngModel"/>
-                        <div *ngIf="date.invalid && (date.dirty || date.touched)" class="alert alert-danger">
-                            <div *ngIf="date.errors['required']">
+                        <input
+                            formControlName="date"
+                            type="date"
+                            class="form-control"
+                            name="date"
+                            data-role="miscellaneous-input-date"
+                            required
+                            id="date" />
+                        <div *ngIf="form.get('date').invalid && (form.get('date').dirty || form.get('date').touched)" class="alert alert-danger">
+                            <div *ngIf="form.get('date').errors['required']">
                                 Ce champ est obligatoire.
                             </div>
-                            <div *ngIf="date.errors['pattern']">
+                            <div *ngIf="form.get('date').errors['pattern']">
                                 La date devrait respecter aaaa-mm-jj.
                             </div>
                         </div>
@@ -32,104 +31,93 @@
                         Montant TTC (€)
                     </label>
                     <div class="expense-miscellaneous-form__block__input-wrapper__item__input">
-                        <input placeholder="ex: 25.50"
-                               type="text"
-                               pattern="([0-9]+(\.[0-9]+)?)"
-                               class="form-control"
-                               name="amount"
-                               data-role="miscellaneous-input-amount"
-                               [(ngModel)]="misc.amount"
-                               required
-                               id="amount"
-                               #amount="ngModel"/>
-                        <div *ngIf="amount.invalid && (amount.dirty || amount.touched)" class="alert alert-danger">
-                            <div *ngIf="amount.errors['required']">
+                        <input
+                            formControlName="amount"
+                            placeholder="ex: 25.50"
+                            type="text"
+                            class="form-control"
+                            name="amount"
+                            data-role="miscellaneous-input-amount"
+                            required
+                            id="amount" />
+                        <div *ngIf="form.get('amount').invalid && (form.get('amount').dirty || form.get('amount').touched)" class="alert alert-danger">
+                            <div *ngIf="form.get('amount').errors['required']">
                                 Ce champ est obligatoire.
                             </div>
-                            <div *ngIf="amount.errors['pattern']">
+                            <div *ngIf="form.get('amount').errors['pattern']">
                                 Seul des chiffres et un point sont acceptés
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div [ngClass]="{
-          'expense-miscellaneous-form__block__input-wrapper__item form-group':
-            !miscellaneousExpensesService.vatDeductible(this.misc) || misc.selectedType === 1,
-          'expense-miscellaneous-form__block__input-wrapper__item2 form-group2':
-            (miscellaneousExpensesService.vatDeductible(this.misc) && misc.selectedType !== 1)
-        }" data-role="miscellaneous-block-type">
+                <div [className]="showColumn() ? 'expense-miscellaneous-form__block__input-wrapper__item2 form-group2' : 'expense-miscellaneous-form__block__input-wrapper__item form-group'"
+                     data-role="miscellaneous-block-type">
                     <label for="expenseType" class="expense-miscellaneous-form__block__input-wrapper__item__label">
                         Type de frais
                     </label>
                     <div class="expense-miscellaneous-form__block__input-wrapper__item__input">
-                        <select class="form-control"
-                                name="expenseType"
-                                [(ngModel)]="misc.selectedType"
-                                required
-                                id="expenseType"
-                                #expenseType="ngModel"
-                                data-role="miscellaneous-input-type">
+                        <select
+                            formControlName="expenseType"
+                            class="form-control"
+                            name="expenseType"
+                            required
+                            id="expenseType"
+                            data-role="miscellaneous-input-type">
                             <option [ngValue]="undefined" disabled selected>Type de frais</option>
-                            <option *ngFor="let miscellaneousType of miscellaneousTypes; let i = index" [ngValue]="i">
+                            <option *ngFor="let miscellaneousType of miscellaneousTypes; let i = index" [ngValue]="miscellaneousType">
                                 {{ miscellaneousType.type }}
                                 <span *ngIf="miscellaneousType.vatDeductible">(TVA déductible) </span>
                                 <span *ngIf="!miscellaneousType.vatDeductible">(TVA non déductible) </span>
                             </option>
                         </select>
-                        <div *ngIf="expenseType.invalid && (expenseType.dirty || expenseType.touched)"
+                        <div *ngIf="form.get('expenseType').invalid && (form.get('expenseType').dirty || form.get('expenseType').touched)"
                              class="alert alert-danger">
-                            <div *ngIf="expenseType.errors['required']">
+                            <div *ngIf="form.get('expenseType').errors['required']">
                                 Ce champ est obligatoire.
                             </div>
                         </div>
                     </div>
                 </div>
-                <div *ngIf="(miscellaneousExpensesService.vatDeductible(this.misc) && misc.selectedType !== 1)"
+                <div *ngIf="showColumn()"
                      class="expense-miscellaneous-form__block__input-wrapper__item2 form-group2"
                      data-role="miscellaneous-block-vat-rate">
                     <label for="expenseType" class="expense-miscellaneous-form__block__input-wrapper__item__label">
                         Taux de TVA (%)
                     </label>
                     <div class="expense-miscellaneous-form__block__input-wrapper__item__input">
-                        <select class="form-control"
-                                name="tvaRate"
-                                [(ngModel)]="misc.tvaRate"
-                                required
-                                id="tvaRate"
-                                data-role="miscellaneous-input-vat-rate"
-                                #tvaRate="ngModel">
+                        <select
+                            formControlName="tvaRate"
+                            class="form-control"
+                            name="tvaRate"
+                            id="tvaRate"
+                            data-role="miscellaneous-input-vat-rate" >
                             <option [ngValue]="undefined" disabled selected>Taux de TVA</option>
                             <option *ngFor="let tvaRate of vatRates; let i = index" [ngValue]="tvaRate">
                                 {{ tvaRate }}
                             </option>
                         </select>
-                        <div *ngIf="tvaRate.invalid && (tvaRate.dirty || tvaRate.touched)" class="alert alert-danger">
-                            <div *ngIf="tvaRate.errors['required']">
+                        <div *ngIf="form.get('tvaRate').invalid && (form.get('tvaRate').dirty || form.get('tvaRate').touched)" class="alert alert-danger">
+                            <div *ngIf="form.get('tvaRate').errors['required']">
                                 Ce champ est obligatoire.
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div [ngClass]="{
-          'expense-miscellaneous-form__block__input-wrapper__item form-group':
-            !miscellaneousExpensesService.vatDeductible(this.misc) || misc.selectedType === 1,
-          'expense-miscellaneous-form__block__input-wrapper__item2 form-group2':
-            (miscellaneousExpensesService.vatDeductible(this.misc) && misc.selectedType !== 1)
-          }" data-role="miscellaneous-block-wording">
+                <div [className]="showColumn() ? 'expense-miscellaneous-form__block__input-wrapper__item2 form-group2' : 'expense-miscellaneous-form__block__input-wrapper__item form-group'" data-role="miscellaneous-block-wording">
                     <label for="wording" class="expense-miscellaneous-form__block__input-wrapper__item__label">
                         Libellé <span class="optional">(optionnel)</span>
                     </label>
                     <div class="expense-miscellaneous-form__block__input-wrapper__item__input">
-                        <input type="text"
-                               class="form-control"
-                               name="wording"
-                               [(ngModel)]="misc.wording"
-                               id="wording"
-                               #wording="ngModel"
-                               data-role="miscellaneous-input-wording"/>
-                        <div *ngIf="wording.invalid && (wording.dirty || wording.touched)" class="alert alert-danger">
+                        <input
+                            formControlName="wording"
+                            type="text"
+                            class="form-control"
+                            name="wording"
+                            id="wording"
+                            data-role="miscellaneous-input-wording"/>
+                        <div *ngIf="form.get('wording').invalid && (form.get('wording').dirty || form.get('wording').touched)" class="alert alert-danger">
                         </div>
                     </div>
                 </div>

@@ -4,15 +4,15 @@ import { MiscellaneousExpensesService } from './miscellaneous-expenses.service';
 import { MonetaryService } from 'src/app/shared/services/monetary/monetary.service';
 import { Miscellaneous } from 'src/app/shared/models/miscellaneous.model';
 
-let service: MiscellaneousExpensesService;
-let misc: Miscellaneous;
-
 describe('MiscellaneousExpensesService', () => {
+  let service: MiscellaneousExpensesService;
+  let misc: Miscellaneous;
+
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [MonetaryService],
     }).compileComponents();
-    service = TestBed.get(MiscellaneousExpensesService);
+    service = TestBed.inject(MiscellaneousExpensesService);
   });
 
   it('should be created', () => {
@@ -21,30 +21,21 @@ describe('MiscellaneousExpensesService', () => {
 
   describe('vatDeductible(misc: Miscellaneous)', () => {
     beforeEach(() => {
-      service.miscellaneousTypes = [
-        {
-          type: 'Lavage',
-          vatDeductible: false,
-        },
-        {
-          type: 'Fournitures',
-          vatDeductible: true,
-        },
-      ];
-      misc = { miscellaneousType: '', tvaRate: 10, wording: '', date: '', amount: 10, selectedType: 1 };
+      misc = new Miscellaneous('', 10, '', '', 10);
     });
 
     it('should return "true" if the vat is deductible on this type of miscellaneous expense', () => {
+      misc.miscellaneousType = 'Repas';
       expect(service.vatDeductible(misc)).toBe(true);
     });
 
     it('should return "false" if the vat is non deductible on this type of miscellaneous expense', () => {
-      misc.selectedType = 0;
+      misc.miscellaneousType = 'Transports';
       expect(service.vatDeductible(misc)).toBe(false);
     });
 
     it('should return "false" if the selectedtype property is undefined', () => {
-      misc.selectedType = undefined;
+      misc.miscellaneousType = undefined;
       expect(service.vatDeductible(misc)).toBe(false);
     });
   });

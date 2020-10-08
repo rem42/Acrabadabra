@@ -1,9 +1,10 @@
 import { Component, OnInit, ViewChild, Input, EventEmitter, Output } from '@angular/core';
-import { NgForm } from '@angular/forms';
+import { FormControl, FormGroup, NgForm, Validators } from '@angular/forms';
 import { TimesheetService } from 'src/app/modules/timesheet/services/timesheet.service';
 import { MiscellaneousExpensesService } from '../../services/miscellaneous-expenses.service';
 import { Miscellaneous } from '@model/miscellaneous.model';
 import { MonetaryService } from '@services/monetary/monetary.service';
+import { Regex } from '@utils/regex';
 
 @Component({
   selector: 'app-expense-miscellaneous-form',
@@ -11,13 +12,20 @@ import { MonetaryService } from '@services/monetary/monetary.service';
   styleUrls: ['./expense-miscellaneous-form.component.scss'],
 })
 export class ExpenseMiscellaneousFormComponent implements OnInit {
-  @ViewChild('expenseForm', { static: true }) form: NgForm;
   @Input() miscellaneous: Miscellaneous[];
   @Output() changed: EventEmitter<boolean> = new EventEmitter();
+
+  form = new FormGroup({
+    date: new FormControl(null, [Validators.required, Validators.pattern(Regex.DATE)]),
+    amount: new FormControl(null, [Validators.required, Validators.pattern(Regex.AMOUNT)]),
+    expenseType: new FormControl(null, [Validators.required]),
+    tvaRate: new FormControl(null),
+    wording: new FormControl(null),
+  });
+
   misc: Miscellaneous;
-  submitted = false;
-  miscellaneousTypes = [];
-  vatRates = [];
+  miscellaneousTypes = MiscellaneousExpensesService.MISCELLANEOUS_TYPES;
+  vatRates = MonetaryService.arrayVat;
 
   constructor(
     public miscellaneousExpensesService: MiscellaneousExpensesService,
@@ -27,11 +35,6 @@ export class ExpenseMiscellaneousFormComponent implements OnInit {
 
   ngOnInit() {
     this.misc = new Miscellaneous();
-    this.miscellaneousTypes = this.miscellaneousExpensesService.miscellaneousTypes;
-    this.vatRates = [];
-    Object.values(this._monetaryService.vatRates).forEach(rate => {
-      this.vatRates.push(rate);
-    });
     this.miscellaneous = this.timesheetService.timesheet.miscellaneous;
     this.form.valueChanges.subscribe(() => {
       if (this.form.dirty) {
@@ -40,25 +43,39 @@ export class ExpenseMiscellaneousFormComponent implements OnInit {
     });
   }
 
+  showColumn(): boolean {
+    return (
+      this.form.get('expenseType').value !== undefined &&
+      this.form.get('expenseType').value !== null &&
+      this.form.get('expenseType').value.vatDeductible &&
+      undefined === this.form.get('expenseType').value.vat
+    );
+  }
+
   onSubmit() {
-    if (this.form.valid) {
-      if (this.miscellaneousExpensesService.vatDeductible(this.misc) && this.misc.selectedType === 1) {
-        this.misc.tvaRate = this.miscellaneousExpensesService.miscellaneousTypes[this.misc.selectedType].vat;
-      }
-      if (!this.miscellaneousExpensesService.vatDeductible(this.misc) && this.misc.selectedType !== 5) {
-        this.misc.tvaRate = this.miscellaneousExpensesService.miscellaneousTypes[this.misc.selectedType].vat;
-      }
-      if (!this.miscellaneousExpensesService.vatDeductible(this.misc)) {
-        this.misc.tvaRate = 'NC';
-      }
-      this.misc.miscellaneousType = this.miscellaneousExpensesService.miscellaneousTypes[this.misc.selectedType].type;
-      this.submitted = true;
-      this.miscellaneous.push(Object.assign(new Miscellaneous(), this.misc));
-      this.changed.emit(true);
-    } else {
-      Object.keys(this.form.controls).forEach(field => {
-        this.form.controls[field].markAsTouched();
-      });
+    if (!this.form.valid) {
+      this.form.markAllAsTouched();
+      return;
     }
+
+    const rawValues = this.form.getRawValue();
+    if (rawValues.expenseType.vat === undefined && !rawValues.expenseType.vatDeductible) {
+      rawValues.tvaRate = 'NC';
+    }
+    if (rawValues.expenseType.vat !== undefined) {
+      rawValues.tvaRate = rawValues.expenseType.vat;
+    }
+    rawValues.miscellaneousType = rawValues.expenseType.type;
+
+    this.miscellaneous.push(
+      new Miscellaneous(
+        rawValues.expenseType.type,
+        rawValues.tvaRate,
+        rawValues.wording,
+        rawValues.date,
+        rawValues.amount,
+      ),
+    );
+    this.changed.emit(true);
   }
 }

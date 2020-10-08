@@ -160,7 +160,7 @@ export class InvoicePDFComponent {
         total += miscVat.amount / (1 + miscVat.vatRate / 100);
       }
       if (miscVat.vatRate !== 0) {
-        if (miscVat.vatRate !== this.monetaryService.vatRates.normal) {
+        if (miscVat.vatRate !== MonetaryService.VAT_RATES.normal) {
           this.totalVat.push({
             rate: miscVat.vatRate,
             amount: miscVat.amount - miscVat.amount / (1 + miscVat.vatRate / 100),
@@ -186,13 +186,13 @@ export class InvoicePDFComponent {
 
     this.totalVat = [
       {
-        rate: this.monetaryService.vatRates.normal,
+        rate: MonetaryService.VAT_RATES.normal,
         amount:
           (this.performanceTotal +
             this.expenseFlatFeeTotal +
             this.expenseMileageTotal +
             this.sortByMiscsVatState().nondeductible.amount) *
-          (this.monetaryService.vatRates.normal / 100),
+          (MonetaryService.VAT_RATES.normal / 100),
       },
     ];
     this.totalHT =
