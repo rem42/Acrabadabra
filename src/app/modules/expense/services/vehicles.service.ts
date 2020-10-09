@@ -11,36 +11,35 @@ export class VehiclesService {
     {
       typeOfRate: 'Taux légal:',
       horsePower: '3 CV et moins',
-      allowance: '0.451',
+      allowance: 0.451,
       customizable: false,
     },
     {
       typeOfRate: 'Taux légal:',
       horsePower: '4 CV',
-      allowance: '0.518',
+      allowance: 0.518,
       customizable: false,
     },
     {
       typeOfRate: 'Taux légal:',
       horsePower: '5 CV',
-      allowance: '0.543',
+      allowance: 0.543,
       customizable: false,
     },
     {
       typeOfRate: 'Taux légal:',
       horsePower: '6 CV',
-      allowance: '0.568',
+      allowance: 0.568,
       customizable: false,
     },
     {
       typeOfRate: 'Taux légal:',
       horsePower: '7 CV et plus',
-      allowance: '0.595',
+      allowance: 0.595,
       customizable: false,
     },
     {
       typeOfRate: 'Taux personnalisé',
-      allowance: '',
       customizable: true,
     },
   ];

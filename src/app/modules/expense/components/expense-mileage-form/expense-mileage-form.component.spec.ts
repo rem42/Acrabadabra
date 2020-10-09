@@ -2,6 +2,7 @@ import { ExpenseMileageFormComponent } from './expense-mileage-form.component';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ExpenseMileageTableComponent } from '../expense-mileage-table/expense-mileage-table.component';
+import {Commute} from '@model/commute';
 
 describe('Component: ExpenseMileageForm', () => {
   let component: ExpenseMileageFormComponent;
@@ -85,10 +86,12 @@ describe('Component: ExpenseMileageForm', () => {
 
   it('onSubmit without valid form', () => {
     spyOn(component.form, 'markAllAsTouched');
+    spyOn(component.changed, 'emit');
     component.onSubmit();
 
     expect(component.form.valid).toBeFalsy();
     expect(component.form.markAllAsTouched).toHaveBeenCalledTimes(1);
+    expect(component.changed.emit).toHaveBeenCalledTimes(0);
   });
 
   it('onSubmit with valid form', () => {
@@ -97,5 +100,26 @@ describe('Component: ExpenseMileageForm', () => {
     form.get('journey').setValue('AR Annecy - Lyon');
     form.get('distance').setValue(42);
     form.get('vehicleSelected').setValue(1);
+
+    spyOn(component.changed, 'emit');
+    component.onSubmit();
+
+    expect(component.commutes).toEqual([new Commute('2020-01-01', 'AR Annecy - Lyon', 42, 0.518, 21.756, 1)]);
+    expect(component.changed.emit).toHaveBeenCalledTimes(1);
+  });
+
+  it('onSubmit with valid form with vehicule customizable', () => {
+    const form = component.form;
+    form.get('date').setValue('2020-01-01');
+    form.get('journey').setValue('AR Annecy - Lyon');
+    form.get('distance').setValue(42);
+    form.get('vehicleSelected').setValue(5);
+    form.get('allowance').setValue(100);
+
+    spyOn(component.changed, 'emit');
+    component.onSubmit();
+
+    expect(component.commutes).toEqual([new Commute('2020-01-01', 'AR Annecy - Lyon', 42, 100, 4200, 5)]);
+    expect(component.changed.emit).toHaveBeenCalledTimes(1);
   });
 });
