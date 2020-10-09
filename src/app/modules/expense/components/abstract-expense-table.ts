@@ -1,5 +1,5 @@
 import { EventEmitter, Input, Output } from '@angular/core';
-import { MonetaryService } from '../../../shared/services/monetary/monetary.service';
+import { MonetaryService } from '@services/monetary/monetary.service';
 
 export abstract class AbstractExpenseTable {
   @Output() changed: EventEmitter<boolean> = new EventEmitter();
