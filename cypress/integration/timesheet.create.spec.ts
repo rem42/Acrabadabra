@@ -137,12 +137,11 @@ describe('Test create form CRA', function () {
 
       expect(data.miscellaneous).to.deep.equal([
         {
-          miscellaneousType: 'Péage',
+          miscellaneousType: 'Péage (TVA déductible)',
           tvaRate: 20,
           wording: 'Test',
           date: '2020-01-01',
           amount: '42.42',
-          selectedType: 1,
         },
       ]);
 

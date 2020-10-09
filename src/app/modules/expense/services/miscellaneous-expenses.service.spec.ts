@@ -1,5 +1,4 @@
 import { TestBed } from '@angular/core/testing';
-
 import { MiscellaneousExpensesService } from './miscellaneous-expenses.service';
 import { MonetaryService } from 'src/app/shared/services/monetary/monetary.service';
 import { Miscellaneous } from 'src/app/shared/models/miscellaneous.model';
@@ -25,12 +24,12 @@ describe('MiscellaneousExpensesService', () => {
     });
 
     it('should return "true" if the vat is deductible on this type of miscellaneous expense', () => {
-      misc.miscellaneousType = 'Repas';
+      misc.miscellaneousType = 'Repas (TVA déductible)';
       expect(service.vatDeductible(misc)).toBe(true);
     });
 
     it('should return "false" if the vat is non deductible on this type of miscellaneous expense', () => {
-      misc.miscellaneousType = 'Transports';
+      misc.miscellaneousType = 'Transports (TVA non déductible)';
       expect(service.vatDeductible(misc)).toBe(false);
     });
 

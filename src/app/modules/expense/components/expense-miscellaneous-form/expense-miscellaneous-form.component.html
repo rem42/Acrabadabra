@@ -65,10 +65,8 @@
                             id="expenseType"
                             data-role="miscellaneous-input-type">
                             <option [ngValue]="undefined" disabled selected>Type de frais</option>
-                            <option *ngFor="let miscellaneousType of miscellaneousTypes; let i = index" [ngValue]="miscellaneousType">
+                            <option *ngFor="let miscellaneousType of miscellaneousTypes" [ngValue]="miscellaneousType">
                                 {{ miscellaneousType.type }}
-                                <span *ngIf="miscellaneousType.vatDeductible">(TVA déductible) </span>
-                                <span *ngIf="!miscellaneousType.vatDeductible">(TVA non déductible) </span>
                             </option>
                         </select>
                         <div *ngIf="form.get('expenseType').invalid && (form.get('expenseType').dirty || form.get('expenseType').touched)"
@@ -93,7 +91,7 @@
                             id="tvaRate"
                             data-role="miscellaneous-input-vat-rate" >
                             <option [ngValue]="undefined" disabled selected>Taux de TVA</option>
-                            <option *ngFor="let tvaRate of vatRates; let i = index" [ngValue]="tvaRate">
+                            <option *ngFor="let tvaRate of vatRates" [ngValue]="tvaRate">
                                 {{ tvaRate }}
                             </option>
                         </select>

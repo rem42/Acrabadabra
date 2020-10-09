@@ -9,30 +9,30 @@ import { MiscellaneousType } from '../../../shared/@types/miscellaneousType';
 export class MiscellaneousExpensesService {
   static readonly MISCELLANEOUS_TYPES: MiscellaneousType[] = [
     {
-      type: 'Repas',
+      type: 'Repas (TVA déductible)',
       vatDeductible: true,
     },
     {
-      type: 'Péage',
+      type: 'Péage (TVA déductible)',
       vat: MonetaryService.VAT_RATES.normal,
       vatDeductible: true,
     },
     {
-      type: 'Transports',
+      type: 'Transports (TVA non déductible)',
       vat: MonetaryService.VAT_RATES.reduced,
       vatDeductible: false,
     },
     {
-      type: 'Hébergement',
+      type: 'Hébergement (TVA non déductible)',
       vat: MonetaryService.VAT_RATES.reduced,
       vatDeductible: false,
     },
     {
-      type: 'Autres',
+      type: 'Autres (TVA déductible)',
       vatDeductible: true,
     },
     {
-      type: 'Autres',
+      type: 'Autres (TVA non déductible)',
       vatDeductible: false,
     },
   ];
