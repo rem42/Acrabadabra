@@ -1,18 +1,18 @@
-import { Component, OnInit, ViewChild, Input, Output, EventEmitter } from '@angular/core';
-import { FormControl, FormGroup, NgForm, Validators } from '@angular/forms';
+import { Component, OnInit, Input, Output, EventEmitter, OnDestroy } from '@angular/core';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Commute } from '@model/commute';
 import { TimesheetService } from 'src/app/modules/timesheet/services/timesheet.service';
 import { VehiclesService } from '../../services/vehicles.service';
 import { Regex } from '@utils/regex';
-import { FlatFee } from '@model/flat-fee.model';
 import { plainToClass } from 'class-transformer';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-expense-mileage-form',
   templateUrl: './expense-mileage-form.component.html',
   styleUrls: ['./expense-mileage-form.component.scss'],
 })
-export class ExpenseMileageFormComponent implements OnInit {
+export class ExpenseMileageFormComponent implements OnInit, OnDestroy {
   @Input() commutes: Commute[];
   @Output() changed: EventEmitter<boolean> = new EventEmitter();
 
@@ -24,16 +24,22 @@ export class ExpenseMileageFormComponent implements OnInit {
     allowance: new FormControl(null),
   });
 
+  private valueChangesSubscriber: Subscription;
+
   constructor(public vehiclesService: VehiclesService, public timesheetService: TimesheetService) {}
 
   ngOnInit(): void {
     this.commutes = this.timesheetService.timesheet.commutes;
 
-    this.form.valueChanges.subscribe(() => {
+    this.valueChangesSubscriber = this.form.valueChanges.subscribe(() => {
       if (this.form.dirty) {
         this.changed.emit(true);
       }
     });
+  }
+
+  ngOnDestroy(): void {
+    this.valueChangesSubscriber.unsubscribe();
   }
 
   onSubmit(): void {

@@ -2,7 +2,7 @@ import { ExpenseMileageFormComponent } from './expense-mileage-form.component';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ExpenseMileageTableComponent } from '../expense-mileage-table/expense-mileage-table.component';
-import {Commute} from '@model/commute';
+import { Commute } from '@model/commute';
 
 describe('Component: ExpenseMileageForm', () => {
   let component: ExpenseMileageFormComponent;
@@ -12,7 +12,7 @@ describe('Component: ExpenseMileageForm', () => {
     TestBed.configureTestingModule({
       imports: [ReactiveFormsModule, FormsModule],
       declarations: [ExpenseMileageFormComponent, ExpenseMileageTableComponent],
-    });
+    }).compileComponents();
 
     fixture = TestBed.createComponent(ExpenseMileageFormComponent);
 

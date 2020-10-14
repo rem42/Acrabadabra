@@ -129,7 +129,7 @@ describe('Test create form CRA', function () {
           date: '2020-01-01',
           journey: 'AR Annecy - Lyon',
           distance: '42',
-          allowance: '0.518',
+          allowance: 0.518,
           mileageAllowance: 21.756,
           vehicleSelected: 1,
         },
